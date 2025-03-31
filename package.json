@@ -1,9 +1,17 @@
 {
-  "name": "only-fake",
+  "name": "@only-fake/root",
   "version": "1.0.0",
   "private": true,
   "workspaces": [
     "client",
-    "server"
-  ]
+    "server",
+    "shared"
+  ],
+  "scripts": {
+    "build": "yarn workspaces run build",
+    "dev": "concurrently \"yarn workspace @only-fake/client start\" \"yarn workspace @only-fake/server dev\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
 }
