@@ -9,9 +9,13 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@langchain/core": "^0.3.43",
+    "@langchain/openai": "^0.5.2",
     "@only-fake/shared": "1.0.0",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
     "express": "^4.18.2",
+    "langchain": "^0.3.19",
     "xml2js": "^0.6.2"
   },
   "devDependencies": {
