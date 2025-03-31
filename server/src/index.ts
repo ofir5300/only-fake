@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import { HealthCheckResponse, API_ENDPOINTS } from "@only-fake/shared";
+import { fetchCNNRss } from "./fetchers/cnn";
 
 const app = express();
 const PORT: number = process.env.PORT ? parseInt(process.env.PORT) : 3002;
@@ -17,9 +18,14 @@ app.get(
   }
 );
 
-app.get(API_ENDPOINTS.DUMMY_DATA, (_req: Request, res: Response) => {
+app.get(API_ENDPOINTS.DUMMY_DATA, async (_req: Request, res: Response) => {
+  const articles = await fetchCNNRss();
+  console.log("CNN Top Headlines:");
+  articles.forEach((a: any, i: number) => {
+    console.log(`${i + 1}. ${a.title}`);
+  });
   res.json({
-    message: "This is dummy data from the server!",
+    message: JSON.stringify(articles[0]),
     timestamp: new Date().toISOString(),
   });
 });

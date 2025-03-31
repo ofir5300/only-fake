@@ -14,7 +14,12 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "composite": true,
+    "paths": {
+      "@only-fake/shared": ["../shared/src"]
+    }
   },
-  "include": ["src"]
+  "include": ["src"],
+  "references": [{ "path": "../shared" }]
 }

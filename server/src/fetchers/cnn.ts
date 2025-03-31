@@ -1,9 +1,9 @@
 import axios from "axios";
 import { parseStringPromise } from "xml2js";
-
+import { Article } from "@only-fake/shared";
 const RSS_URL = "http://rss.cnn.com/rss/edition.rss";
 
-export const fetchCNNRss = async () => {
+export const fetchCNNRss = async (): Promise<Article[]> => {
   try {
     const { data: xml } = await axios.get(RSS_URL, {
       responseType: "text",
@@ -12,10 +12,10 @@ export const fetchCNNRss = async () => {
     const result = await parseStringPromise(xml);
     const items = result.rss.channel[0].item;
 
-    const parsed = items.map((item: any) => ({
+    const parsed: Article[] = items.map((item: any) => ({
       title: item.title[0],
-      link: item.link[0],
-      pubDate: item.pubDate?.[0],
+      url: item.link[0],
+      date: item.pubDate?.[0],
       description: item.description?.[0],
     }));
 
@@ -24,12 +24,4 @@ export const fetchCNNRss = async () => {
     console.error("Failed to fetch CNN RSS feed:", error);
     return [];
   }
-};
-
-export const articles = async () => {
-  const articles = await fetchCNNRss();
-  console.log("CNN Top Headlines:");
-  articles.forEach((a: any, i: number) => {
-    console.log(`${i + 1}. ${a.title}`);
-  });
 };
