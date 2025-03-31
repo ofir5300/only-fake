@@ -17,9 +17,11 @@
     "jsx": "react-jsx",
     "composite": true,
     "paths": {
-      "@only-fake/shared": ["../shared/src"]
+      "@/*": ["src/*"],
+      "@only-fake/shared": ["../shared/dist"]
     }
   },
-  "include": ["src"],
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"],
   "references": [{ "path": "../shared" }]
 }

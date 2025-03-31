@@ -6,11 +6,7 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
-
-interface DummyData {
-  message: string;
-  timestamp: string;
-}
+import { API_BASE_URL, API_ENDPOINTS, FakeArticle } from "@only-fake/shared";
 
 const theme = createTheme({
   palette: {
@@ -25,13 +21,13 @@ const theme = createTheme({
 });
 
 function App() {
-  const [data, setData] = useState<DummyData | null>(null);
+  const [data, setData] = useState<FakeArticle[] | null>(null);
   const [loading, setLoading] = useState(false);
 
   const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:3002/api/dummy-data");
+      const response = await fetch(`${API_BASE_URL}/api${API_ENDPOINTS.CNN}`);
       const result = await response.json();
       setData(result);
     } catch (error) {
@@ -63,15 +59,23 @@ function App() {
           </Button>
 
           {data && (
-            <Paper elevation={2} sx={{ p: 2, mt: 2 }}>
-              <Typography variant="h6" gutterBottom>
-                Server Response:
-              </Typography>
-              <Typography variant="body1">{data.message}</Typography>
-              <Typography variant="caption" color="text.secondary">
-                Received at: {new Date(data.timestamp).toLocaleString()}
-              </Typography>
-            </Paper>
+            <Box sx={{ mt: 2 }}>
+              {data.map((article, index) => (
+                <Paper key={index} elevation={2} sx={{ p: 2, mb: 2 }}>
+                  <Typography variant="h6" gutterBottom>
+                    {article.fake_title || 'No Title'}
+                  </Typography>
+                  <Typography variant="body1">
+                    {article.fake_description || 'No Description'}
+                  </Typography>
+                  {article.category && (
+                    <Typography variant="caption" color="text.secondary">
+                      Category: {article.category}
+                    </Typography>
+                  )}
+                </Paper>
+              ))}
+            </Box>
           )}
         </Box>
       </Container>

@@ -1,9 +1,4 @@
 // API Response Types
-export interface DummyData {
-  message: string;
-  timestamp: string;
-}
-
 export interface HealthCheckResponse {
   status: string;
   message: string;
