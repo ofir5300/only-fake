@@ -6,7 +6,12 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
-import { API_BASE_URL, API_ENDPOINTS, FakeArticle } from "@only-fake/shared";
+import {
+  API_BASE_URL,
+  API_ENDPOINTS,
+  FakeArticle,
+  SOURCES,
+} from "@only-fake/shared";
 
 const theme = createTheme({
   palette: {
@@ -27,7 +32,9 @@ function App() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/api${API_ENDPOINTS.CNN}`);
+      const response = await fetch(
+        `${API_BASE_URL}/api${API_ENDPOINTS.ARTICLES}/${SOURCES.CNN}`
+      ); //. todo modular per source
       const result = await response.json();
       setData(result);
     } catch (error) {
@@ -63,10 +70,10 @@ function App() {
               {data.map((article, index) => (
                 <Paper key={index} elevation={2} sx={{ p: 2, mb: 2 }}>
                   <Typography variant="h6" gutterBottom>
-                    {article.fake_title || 'No Title'}
+                    {article.fake_title || "No Title"}
                   </Typography>
                   <Typography variant="body1">
-                    {article.fake_description || 'No Description'}
+                    {article.fake_description || "No Description"}
                   </Typography>
                   {article.category && (
                     <Typography variant="caption" color="text.secondary">

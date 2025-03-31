@@ -1,22 +1,25 @@
-import { fetchCNNRss } from "../fetchers/cnn";
+import { extractAndTransform } from "../fetchers";
 import { OpenAIService } from "../llm/OpenAI";
-import { FakeArticle } from "@only-fake/shared";
+import { FakeArticle, NewsSource, SOURCES } from "@only-fake/shared";
 
 type GetArticlesParams = {
+  source: NewsSource;
   limit?: number;
 };
 
-//  todo stream here
-// maybe with generators?
-export const getCNNArticles = async ({
+export const getArticles = async ({
+  source,
   limit = 10,
 }: GetArticlesParams): Promise<FakeArticle[]> => {
-  const articles = await fetchCNNRss();
+  const articles = await extractAndTransform(source);
   const openai = OpenAIService.getInstance();
   const fakeArticles = await Promise.all(
-    articles.slice(0, limit).map(async (article: any) => {
-      return await openai.generateFakeArticle(article);
-    })
+    //  todo stream here
+    // maybe with generators?
+    articles.slice(0, limit).map(async (article: any) => ({
+      ...article,
+      ...(await openai.generateFakeArticle(article)),
+    }))
   );
   console.log(fakeArticles);
   return fakeArticles;

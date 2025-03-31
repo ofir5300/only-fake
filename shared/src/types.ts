@@ -1,3 +1,5 @@
+import { SOURCES } from "./consts";
+
 // API Response Types
 export interface HealthCheckResponse {
   status: string;
@@ -16,3 +18,8 @@ export interface FakeArticle extends Article {
   fake_description?: string;
   category?: string;
 }
+
+export type Extractor = () => Promise<any[]>;
+export type Transformer = (data: any[]) => Article[];
+
+export type NewsSource = (typeof SOURCES)[keyof typeof SOURCES];

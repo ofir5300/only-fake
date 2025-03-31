@@ -2,15 +2,17 @@ import {
   API_ENDPOINTS,
   FakeArticle,
   HealthCheckResponse,
+  NewsSource,
 } from "@only-fake/shared";
-import { getCNNArticles } from "./articles";
+import { getArticles } from "./articles";
 import { Router, Request, Response } from "express";
 
-const getCNNArticlesHandler = async (
-  _req: Request,
+const getArticlesHandler = async (
+  req: Request<{ source: NewsSource }>,
   res: Response<FakeArticle[]>
 ) => {
-  res.json(await getCNNArticles({ limit: 1 }));
+  const source = req.params.source as NewsSource;
+  res.json(await getArticles({ source, limit: 2 }));
 };
 
 const getHealthCheckHandler = (
@@ -23,7 +25,7 @@ const getHealthCheckHandler = (
 export const getRouter = (): Router => {
   const router = Router();
   router.get(API_ENDPOINTS.HEALTH, getHealthCheckHandler);
-  router.get(API_ENDPOINTS.CNN, getCNNArticlesHandler);
+  router.get(`${API_ENDPOINTS.ARTICLES}/:source`, getArticlesHandler);
 
   return router;
 };
