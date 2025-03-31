@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Container from "@mui/material/Container";
@@ -12,6 +12,7 @@ import {
   FakeArticle,
   SOURCES,
 } from "@only-fake/shared";
+import { useSSE } from "./hooks/useSSE";
 
 const theme = createTheme({
   palette: {
@@ -26,7 +27,7 @@ const theme = createTheme({
 });
 
 function App() {
-  const [data, setData] = useState<FakeArticle[] | null>(null);
+  const [data, setData] = useState<FakeArticle[]>([]);
   const [loading, setLoading] = useState(false);
 
   const fetchData = async () => {
@@ -44,6 +45,35 @@ function App() {
     }
   };
 
+  const { connect } = useSSE(
+    `${API_BASE_URL}/api${API_ENDPOINTS.ARTICLES_STREAM}/${SOURCES.CNN}`,
+    {
+      onOpen: () => {
+        setLoading(true);
+        setData([]); // Reset data on new connection
+      },
+      onMessage: (event) => {
+        console.log("Received event:", event); // Debug
+        const article = event as FakeArticle;
+        setData((prev) => [...prev, article]);
+      },
+      onError: () => {
+        setLoading(false);
+      },
+    }
+  );
+
+  // Auto-connect on mount
+  useEffect(() => {
+    connect();
+  }, []);
+
+  const handleGenerate = () => {
+    setLoading(true);
+    setData([]); // Clear existing data
+    connect(); // Start new connection
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -52,38 +82,36 @@ function App() {
           <Typography variant="h4" component="h1" gutterBottom>
             Welcome to Only Fake
           </Typography>
-          <Typography variant="body1" gutterBottom>
-            Your React + MUI application is running successfully!
+          <Typography variant="subtitle1" gutterBottom>
+            Now faking data from {SOURCES.CNN}
           </Typography>
 
           <Button
             variant="contained"
-            onClick={fetchData}
+            onClick={handleGenerate}
             disabled={loading}
             sx={{ my: 2 }}
           >
-            {loading ? "Loading..." : "Fetch Dummy Data"}
+            {loading ? "Generating..." : "Generate Articles"}
           </Button>
 
-          {data && (
-            <Box sx={{ mt: 2 }}>
-              {data.map((article, index) => (
-                <Paper key={index} elevation={2} sx={{ p: 2, mb: 2 }}>
-                  <Typography variant="h6" gutterBottom>
-                    {article.fake_title || "No Title"}
+          <Box sx={{ mt: 2 }}>
+            {data.map((article, index) => (
+              <Paper key={index} elevation={2} sx={{ p: 2, mb: 2 }}>
+                <Typography variant="h6" gutterBottom>
+                  {article.fake_title}
+                </Typography>
+                <Typography variant="body1">
+                  {article.fake_description}
+                </Typography>
+                {article.category && (
+                  <Typography variant="caption" color="text.secondary">
+                    Category: {article.category}
                   </Typography>
-                  <Typography variant="body1">
-                    {article.fake_description || "No Description"}
-                  </Typography>
-                  {article.category && (
-                    <Typography variant="caption" color="text.secondary">
-                      Category: {article.category}
-                    </Typography>
-                  )}
-                </Paper>
-              ))}
-            </Box>
-          )}
+                )}
+              </Paper>
+            ))}
+          </Box>
         </Box>
       </Container>
     </ThemeProvider>

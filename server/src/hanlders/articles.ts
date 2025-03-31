@@ -7,20 +7,29 @@ type GetArticlesParams = {
   limit?: number;
 };
 
+export async function* generateArticles({
+  source,
+  limit = 10,
+}: GetArticlesParams): AsyncGenerator<FakeArticle> {
+  const articles = await extractAndTransform(source);
+  const openai = OpenAIService.getInstance();
+
+  for (const article of articles.slice(0, limit)) {
+    const fakeArticle = {
+      ...article,
+      ...(await openai.generateFakeArticle(article)),
+    };
+    yield fakeArticle;
+  }
+}
+
 export const getArticles = async ({
   source,
   limit = 10,
 }: GetArticlesParams): Promise<FakeArticle[]> => {
-  const articles = await extractAndTransform(source);
-  const openai = OpenAIService.getInstance();
-  const fakeArticles = await Promise.all(
-    //  todo stream here
-    // maybe with generators?
-    articles.slice(0, limit).map(async (article: any) => ({
-      ...article,
-      ...(await openai.generateFakeArticle(article)),
-    }))
-  );
-  console.log(fakeArticles);
+  const fakeArticles: FakeArticle[] = [];
+  for await (const article of generateArticles({ source, limit })) {
+    fakeArticles.push(article);
+  }
   return fakeArticles;
 };

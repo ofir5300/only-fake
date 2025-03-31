@@ -2,6 +2,7 @@
 export const API_ENDPOINTS = {
   HEALTH: "/health",
   ARTICLES: "/articles",
+  ARTICLES_STREAM: "/articles/stream",
 } as const;
 
 // API Base URL

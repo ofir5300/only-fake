@@ -15,13 +15,12 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "composite": true,
+    "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@only-fake/shared": ["../shared/dist"]
+      "@only-fake/shared": ["../shared/src"]
     }
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"],
-  "references": [{ "path": "../shared" }]
+  "include": ["src/**/*", "src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules", "dist"]
 }

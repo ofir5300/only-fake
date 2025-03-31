@@ -4,7 +4,7 @@ import {
   HealthCheckResponse,
   NewsSource,
 } from "@only-fake/shared";
-import { getArticles } from "./articles";
+import { generateArticles, getArticles } from "./articles";
 import { Router, Request, Response } from "express";
 
 const getArticlesHandler = async (
@@ -22,10 +22,34 @@ const getHealthCheckHandler = (
   res.json({ status: "ok", message: "Server is running!" });
 };
 
+const getArticlesStreamHandler = async (req: Request, res: Response) => {
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+
+  const source = req.params.source as NewsSource;
+  const sendEvent = (data: any) => {
+    res.write(`data: ${JSON.stringify(data)}\n\n`);
+  };
+
+  for await (const article of generateArticles({ source, limit: 2 })) {
+    sendEvent(article);
+  }
+
+  // Handle client disconnect
+  req.on("close", () => {
+    console.log("Client disconnected from SSE");
+  });
+};
+
 export const getRouter = (): Router => {
   const router = Router();
   router.get(API_ENDPOINTS.HEALTH, getHealthCheckHandler);
   router.get(`${API_ENDPOINTS.ARTICLES}/:source`, getArticlesHandler);
+  router.get(
+    `${API_ENDPOINTS.ARTICLES_STREAM}/:source`,
+    getArticlesStreamHandler
+  );
 
   return router;
 };
