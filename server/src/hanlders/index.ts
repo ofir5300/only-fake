@@ -3,6 +3,7 @@ import {
   FakeArticle,
   HealthCheckResponse,
   NewsSource,
+  SSEEvent,
 } from "@only-fake/shared";
 import { generateArticles, getArticles } from "./articles";
 import { Router, Request, Response } from "express";
@@ -28,13 +29,15 @@ const getArticlesStreamHandler = async (req: Request, res: Response) => {
   res.setHeader("Connection", "keep-alive");
 
   const source = req.params.source as NewsSource;
-  const sendEvent = (data: any) => {
+  const sendEvent = (data: SSEEvent) => {
     res.write(`data: ${JSON.stringify(data)}\n\n`);
   };
 
   for await (const article of generateArticles({ source, limit: 2 })) {
-    sendEvent(article);
+    sendEvent({ type: "article", data: JSON.stringify(article) });
   }
+
+  sendEvent({ type: "done", data: "" });
 
   // Handle client disconnect
   req.on("close", () => {

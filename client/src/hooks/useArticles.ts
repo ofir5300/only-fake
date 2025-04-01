@@ -5,13 +5,14 @@ import {
   API_ENDPOINTS,
   FakeArticle,
   SOURCES,
+  NewsSource,
 } from "@only-fake/shared";
 import { useSSE } from "./useSSE";
 
 const fetchEndpoint = `${API_BASE_URL}/api${API_ENDPOINTS.ARTICLES}/${SOURCES.CNN}`;
 const streamEndpoint = `${API_BASE_URL}/api${API_ENDPOINTS.ARTICLES_STREAM}/${SOURCES.CNN}`;
 
-export const useArticles = (source = SOURCES.CNN) => {
+export const useArticles = (source: NewsSource) => {
   const [data, setData] = useState<FakeArticle[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,15 +29,12 @@ export const useArticles = (source = SOURCES.CNN) => {
       console.log("Received event:", event); // Debug
       const article = event as FakeArticle;
       setData((prev) => [...prev, article]);
-      // try {
-      // 	const article = JSON.parse(event.data) as FakeArticle;
-      // 	setData((prev) => [...prev, article]);
-      // } catch (error) {
-      // 	console.error("Error parsing SSE data:", error);
-      // }
     },
     onError: () => {
       setStatus("Disconnected");
+      setLoading(false);
+    },
+    onClose: () => {
       setLoading(false);
     },
   });

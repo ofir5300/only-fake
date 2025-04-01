@@ -23,3 +23,8 @@ export type Extractor = () => Promise<any[]>;
 export type Transformer = (data: any[]) => Article[];
 
 export type NewsSource = (typeof SOURCES)[keyof typeof SOURCES];
+
+export type SSEEvent = {
+  type: "article" | "done";
+  data: string;
+};
