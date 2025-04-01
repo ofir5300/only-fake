@@ -11,6 +11,9 @@ import AutorenewIcon from "@mui/icons-material/Autorenew";
 import CircularProgress from "@mui/material/CircularProgress";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
+import Tooltip from "@mui/material/Tooltip";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import Button from "@mui/material/Button";
 
 import { useArticles } from "./hooks/useArticles";
 const logo = require("./assets/logo.png");
@@ -157,63 +160,76 @@ export const App = () => {
                 transition={{ delay: index * 0.1 }}
                 key={index}
               >
-                <Box
-                  sx={{
-                    p: 4,
-                    borderRadius: 2,
-                    background: "rgba(255, 255, 255, 0.03)",
-                    backdropFilter: "blur(10px)",
-                    border: "1px solid rgba(255, 255, 255, 0.05)",
-                    transition: "all 0.3s ease",
-                    "&:hover": {
-                      transform: "translateY(-4px)",
-                      background: "rgba(255, 255, 255, 0.05)",
-                    },
-                  }}
+                <Tooltip
+                  title={
+                    <Box sx={{ p: 1 }}>
+                      <Typography variant="body2" sx={{ mb: 1 }}>
+                        {article.title}
+                      </Typography>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        endIcon={<OpenInNewIcon />}
+                        onClick={() => window.open(article.url, "_blank")}
+                        sx={{
+                          background:
+                            "linear-gradient(45deg, #FF3366, #FF6B6B)",
+                        }}
+                      >
+                        Read Original
+                      </Button>
+                    </Box>
+                  }
+                  arrow
                 >
                   <Box
                     sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      mb: 2,
+                      p: 4,
+                      borderRadius: 2,
+                      background: "rgba(255, 255, 255, 0.03)",
+                      backdropFilter: "blur(10px)",
+                      border: "1px solid rgba(255, 255, 255, 0.05)",
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        transform: "translateY(-4px)",
+                        background: "rgba(255, 255, 255, 0.05)",
+                      },
                     }}
                   >
-                    <Typography
-                      variant="overline"
+                    <Box
                       sx={{
-                        color: "#FF3366",
-                        letterSpacing: 2,
+                        display: "flex",
+                        justifyContent: "space-between",
+                        mb: 2,
                       }}
                     >
-                      {article.category}
+                      <Typography variant="overline" sx={{ color: "#FF3366" }}>
+                        {article.category}
+                      </Typography>
+                      <Typography variant="caption" sx={{ opacity: 0.5 }}>
+                        {format(new Date(), "MMM dd, yyyy")}
+                      </Typography>
+                    </Box>
+                    <Typography
+                      variant="h4"
+                      sx={{
+                        mb: 2,
+                        fontWeight: 700,
+                        background: "linear-gradient(45deg, #FFF, #FF3366)",
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                      }}
+                    >
+                      {article.fake_title}
                     </Typography>
-                    <Typography variant="caption" sx={{ opacity: 0.5 }}>
-                      {format(new Date(), "MMM dd, yyyy")}
+                    <Typography
+                      variant="body1"
+                      sx={{ opacity: 0.8, lineHeight: 1.8 }}
+                    >
+                      {article.fake_description}
                     </Typography>
                   </Box>
-                  <Typography
-                    variant="h4"
-                    sx={{
-                      mb: 2,
-                      fontWeight: 700,
-                      background: "linear-gradient(45deg, #FFF, #FF3366)",
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                    }}
-                  >
-                    {article.fake_title}
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      opacity: 0.8,
-                      lineHeight: 1.8,
-                      fontSize: "1.1rem",
-                    }}
-                  >
-                    {article.fake_description}
-                  </Typography>
-                </Box>
+                </Tooltip>
               </MotionGrid>
             ))}
           </Grid>
