@@ -309,6 +309,7 @@ export const App = () => {
                         },
                       }}
                     >
+                      {/* Header Section - Always at top */}
                       <Box
                         sx={{
                           display: "flex",
@@ -318,7 +319,10 @@ export const App = () => {
                       >
                         <Typography
                           variant="overline"
-                          sx={{ color: "#FF3366" }}
+                          sx={{
+                            color: "#FF3366",
+                            letterSpacing: 2,
+                          }}
                         >
                           {article.category}
                         </Typography>
@@ -326,10 +330,11 @@ export const App = () => {
                           {format(new Date(), "MMM dd, yyyy")}
                         </Typography>
                       </Box>
+
                       <Typography
                         variant="h4"
                         sx={{
-                          mb: 2,
+                          mb: 3,
                           fontWeight: 700,
                           background: "linear-gradient(45deg, #FFF, #FF3366)",
                           WebkitBackgroundClip: "text",
@@ -338,12 +343,60 @@ export const App = () => {
                       >
                         {article.fake_title}
                       </Typography>
-                      <Typography
-                        variant="body1"
-                        sx={{ opacity: 0.8, lineHeight: 1.8 }}
+
+                      {/* Content Section with conditional image */}
+                      <Box
+                        sx={{
+                          display: "flex",
+                          gap: 4,
+                          alignItems: "center",
+                        }}
                       >
-                        {article.fake_description}
-                      </Typography>
+                        {article.image && article.image !== "" && (
+                          <Box
+                            sx={{
+                              flexShrink: 0,
+                              width: 280,
+                              height: 200,
+                              position: "relative",
+                              borderRadius: 2,
+                              overflow: "hidden",
+                              border: "1px solid rgba(255, 255, 255, 0.1)",
+                              alignSelf: "center",
+                            }}
+                          >
+                            <Box
+                              component="img"
+                              src={article.image}
+                              alt={article.title}
+                              sx={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                                transition: "transform 0.3s ease",
+                                "&:hover": {
+                                  transform: "scale(1.05)",
+                                },
+                              }}
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display =
+                                  "none";
+                              }}
+                            />
+                          </Box>
+                        )}
+                        <Typography
+                          variant="body1"
+                          sx={{
+                            flex: 1,
+                            opacity: 0.8,
+                            lineHeight: 1.8,
+                            fontSize: "1.1rem",
+                          }}
+                        >
+                          {article.fake_description}
+                        </Typography>
+                      </Box>
                     </Box>
                   </Tooltip>
                 </MotionGrid>

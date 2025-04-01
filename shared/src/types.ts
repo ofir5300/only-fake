@@ -11,6 +11,7 @@ export interface Article {
   url: string;
   date: string;
   description: string;
+  image?: string;
 }
 
 export interface FakeArticle extends Article {

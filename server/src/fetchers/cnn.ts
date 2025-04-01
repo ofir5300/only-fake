@@ -23,4 +23,5 @@ export const transformCNNArticles = (data: any[]): Article[] =>
     url: item.link[0],
     date: item.pubDate?.[0],
     description: item.description?.[0],
+    image: item?.["media:group"][0]["media:content"][0]["$"]?.url || undefined,
   }));

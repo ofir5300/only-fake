@@ -34,7 +34,7 @@ export const extractAndTransform = async (
     const articles = transformer(rawData);
 
     return articles;
-  } catch (error) {
+  } catch (error: any) {
     console.error(`Failed to fetch ${source} feed:`, error);
     throw error;
   }
