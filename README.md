@@ -91,5 +91,3 @@ yarn workspace @only-fake/shared build
 ```bash
 yarn dev
 ```
-
-## 📁 Project Structure
