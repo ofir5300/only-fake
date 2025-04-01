@@ -1,4 +1,3 @@
-import React, { useEffect, useRef, useState } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Container from "@mui/material/Container";
@@ -6,13 +5,9 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
-import {
-  API_BASE_URL,
-  API_ENDPOINTS,
-  FakeArticle,
-  SOURCES,
-} from "@only-fake/shared";
-import { useSSE } from "./hooks/useSSE";
+import { SOURCES } from "@only-fake/shared";
+import { useArticles } from "./hooks/useArticles";
+import { useEffect } from "react";
 
 const theme = createTheme({
   palette: {
@@ -26,53 +21,15 @@ const theme = createTheme({
   },
 });
 
-function App() {
-  const [data, setData] = useState<FakeArticle[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(
-        `${API_BASE_URL}/api${API_ENDPOINTS.ARTICLES}/${SOURCES.CNN}`
-      ); //. todo modular per source
-      const result = await response.json();
-      setData(result);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const { connect } = useSSE(
-    `${API_BASE_URL}/api${API_ENDPOINTS.ARTICLES_STREAM}/${SOURCES.CNN}`,
-    {
-      onOpen: () => {
-        setLoading(true);
-        setData([]); // Reset data on new connection
-      },
-      onMessage: (event) => {
-        console.log("Received event:", event); // Debug
-        const article = event as FakeArticle;
-        setData((prev) => [...prev, article]);
-      },
-      onError: () => {
-        setLoading(false);
-      },
-    }
+export const App = () => {
+  const { data, loading, error, status, streamArticles } = useArticles(
+    SOURCES.CNN
   );
 
   // Auto-connect on mount
   useEffect(() => {
-    connect();
+    streamArticles();
   }, []);
-
-  const handleGenerate = () => {
-    setLoading(true);
-    setData([]); // Clear existing data
-    connect(); // Start new connection
-  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -83,12 +40,13 @@ function App() {
             Welcome to Only Fake
           </Typography>
           <Typography variant="subtitle1" gutterBottom>
-            Now faking data from {SOURCES.CNN}
+            Now faking data from {SOURCES.CNN}. Status: {status}{" "}
+            {error && `(Error: ${error})`}
           </Typography>
 
           <Button
             variant="contained"
-            onClick={handleGenerate}
+            onClick={streamArticles}
             disabled={loading}
             sx={{ my: 2 }}
           >
@@ -116,6 +74,4 @@ function App() {
       </Container>
     </ThemeProvider>
   );
-}
-
-export default App;
+};

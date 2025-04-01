@@ -14,7 +14,7 @@ type UseSSEOptions = {
 export const useSSE = (url: string, options: UseSSEOptions = {}) => {
   const eventSourceRef = useRef<EventSource | null>(null);
 
-  const connect = useCallback(() => {
+  const streamFromBackend = useCallback(() => {
     // Close existing connection if any
     eventSourceRef.current?.close();
 
@@ -49,5 +49,5 @@ export const useSSE = (url: string, options: UseSSEOptions = {}) => {
     };
   }, []);
 
-  return { connect };
+  return { streamFromBackend };
 };
