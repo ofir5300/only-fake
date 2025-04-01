@@ -1,3 +1,4 @@
+import { generateFakeArticle } from "../llm";
 import { extractAndTransform } from "../fetchers";
 import { OpenAIService } from "../llm/OpenAI";
 import { FakeArticle, NewsSource, SOURCES } from "@only-fake/shared";
@@ -12,12 +13,11 @@ export async function* generateArticles({
   limit = 10,
 }: GetArticlesParams): AsyncGenerator<FakeArticle> {
   const articles = await extractAndTransform(source);
-  const openai = OpenAIService.getInstance();
 
   for (const article of articles.slice(0, limit)) {
     const fakeArticle = {
       ...article,
-      ...(await openai.generateFakeArticle(article)),
+      ...(await generateFakeArticle(article)),
     };
     yield fakeArticle;
   }
