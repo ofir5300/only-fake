@@ -13,7 +13,7 @@ const getArticlesHandler = async (
   res: Response<FakeArticle[]>
 ) => {
   const source = req.params.source as NewsSource;
-  res.json(await getArticles({ source, limit: 2 }));
+  res.json(await getArticles({ source, limit: 10 }));
 };
 
 const getHealthCheckHandler = (
@@ -34,7 +34,7 @@ const getArticlesStreamHandler = async (req: Request, res: Response) => {
   };
 
   try {
-    for await (const article of generateArticles({ source, limit: 2 })) {
+    for await (const article of generateArticles({ source, limit: 10 })) {
       sendEvent({ type: "article", data: JSON.stringify(article) });
     }
     sendEvent({ type: "done", data: "" });

@@ -1,0 +1,33 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Builds
+dist
+**/dist
+build
+**/build
+
+# Dev/Environment
+/.env
+/client/.env
+/server/.env
+.env.local
+.env.*.local
+.git
+.gitignore
+.vscode
+.idea
+*.log
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Misc
+README.md
+*.md
+.DS_Store
+coverage
+.coverage 

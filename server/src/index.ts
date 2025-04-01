@@ -6,7 +6,9 @@ import { getRouter } from "./hanldlers";
 dotenv.config();
 
 const app = express();
-const PORT: number = process.env.PORT ? parseInt(process.env.PORT) : 3002;
+const PORT: number = process.env.SERVER_PORT
+  ? parseInt(process.env.SERVER_PORT)
+  : 3002;
 
 // Middleware
 app.use(cors());

@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001" # Client
+      - "3002:3002" # Server
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - ./client/.env
+      - ./server/.env
+    volumes:
+      - ./client/src:/app/client/src
+      - ./server/src:/app/server/src
+      - ./shared/src:/app/shared/src
+      # Preserve installed dependencies
+      - node_modules:/app/node_modules
+      - client_node_modules:/app/client/node_modules
+      - server_node_modules:/app/server/node_modules
+      - shared_node_modules:/app/shared/node_modules
+
+volumes:
+  node_modules:
+  client_node_modules:
+  server_node_modules:
+  shared_node_modules:

@@ -9,7 +9,11 @@
   ],
   "scripts": {
     "build": "yarn workspaces run build",
-    "dev": "concurrently \"yarn workspace @only-fake/client start\" \"yarn workspace @only-fake/server dev\""
+    "start:all": "concurrently \"yarn workspace @only-fake/client start\" \"yarn workspace @only-fake/server dev\"",
+    "docker:setup": "cp client/.env.example client/.env && cp server/.env.example server/.env",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up",
+    "docker:down": "docker-compose down"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
