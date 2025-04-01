@@ -1,4 +1,4 @@
-import { SOURCES } from "./consts";
+import { CATEGORIES, SOURCES } from "./consts";
 
 // API Response Types
 export interface HealthCheckResponse {
@@ -16,7 +16,7 @@ export interface Article {
 export interface FakeArticle extends Article {
   fake_title?: string;
   fake_description?: string;
-  category?: string;
+  category?: CATEGORIES;
 }
 
 export type Extractor = () => Promise<any[]>;

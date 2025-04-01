@@ -1,12 +1,18 @@
-import { Article } from "@only-fake/shared";
+import { Article, CATEGORIES } from "@only-fake/shared";
 import { OpenAIService } from "./OpenAI";
 import { z } from "zod";
 import { SYSTEM_PROMPTS } from "./prompts";
-// Define Zod schema based on FakeArticle type
+
 const fakeArticleSchema = z.object({
-  fake_title: z.string().optional(),
-  fake_description: z.string().optional(),
-  category: z.string().optional(), //	todo enum
+  fake_title: z.string().optional().describe("A fake version of the title"),
+  fake_description: z
+    .string()
+    .optional()
+    .describe("A fake version of the description"),
+  category: z
+    .nativeEnum(CATEGORIES)
+    .optional()
+    .describe("A category for the original article"),
 });
 
 type FakeArticleOutput = z.infer<typeof fakeArticleSchema>;

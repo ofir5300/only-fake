@@ -12,3 +12,19 @@ export const SOURCES = {
   CNN: "cnn",
   GEEKTIME: "geektime",
 } as const;
+
+export enum CATEGORIES {
+  World = "World",
+  USPolitics = "US Politics",
+  Business = "Business",
+  Markets = "Markets",
+  Health = "Health",
+  Entertainment = "Entertainment",
+  Tech = "Tech",
+  Style = "Style",
+  Travel = "Travel",
+  Sports = "Sports",
+  Science = "Science",
+  Climate = "Climate",
+  War = "War",
+}

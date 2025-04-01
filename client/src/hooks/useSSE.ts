@@ -49,10 +49,10 @@ export const useSSE = (options: UseSSEOptions = {}) => {
         }
       };
 
-      eventSource.onerror = (error) => {
-        console.error("SSE Error:", error);
+      eventSource.onerror = (event) => {
+        console.error("SSE Error:", event);
         eventSource.close();
-        options.onError?.(error);
+        options.onError?.(event);
       };
 
       eventSourceRef.current = eventSource;
