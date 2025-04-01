@@ -12,6 +12,7 @@ const getArticlesHandler = async (
   req: Request<{ source: NewsSource }>,
   res: Response<FakeArticle[]>
 ) => {
+  console.log("Articles request received");
   const source = req.params.source as NewsSource;
   res.json(await getArticles({ source, limit: 10 }));
 };
@@ -20,16 +21,19 @@ const getHealthCheckHandler = (
   _req: Request,
   res: Response<HealthCheckResponse>
 ) => {
+  console.log("Health check received");
   res.json({ status: "ok", message: "Server is running!" });
 };
 
 const getArticlesStreamHandler = async (req: Request, res: Response) => {
+  console.log("Articles stream received");
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
 
   const source = req.params.source as NewsSource;
   const sendEvent = (data: SSEEvent) => {
+    console.log("Sending event:", data.type);
     res.write(`data: ${JSON.stringify(data)}\n\n`);
   };
 
@@ -43,7 +47,6 @@ const getArticlesStreamHandler = async (req: Request, res: Response) => {
     sendEvent({ type: "error", data: error?.toString() });
   }
 
-  // Handle client disconnect
   req.on("close", () => {
     console.log("Client disconnected from SSE");
   });
