@@ -1,40 +1,45 @@
 import axios from "axios";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   API_BASE_URL,
   API_ENDPOINTS,
   FakeArticle,
-  SOURCES,
   NewsSource,
+  SOURCES,
 } from "@only-fake/shared";
 import { useSSE } from "./useSSE";
 
-const fetchEndpoint = `${API_BASE_URL}/api${API_ENDPOINTS.ARTICLES}/${SOURCES.CNN}`;
-const streamEndpoint = `${API_BASE_URL}/api${API_ENDPOINTS.ARTICLES_STREAM}/${SOURCES.CNN}`;
+const getEndpoints = (source: NewsSource, streaming: boolean) =>
+  `${API_BASE_URL}/api${
+    streaming ? API_ENDPOINTS.ARTICLES_STREAM : API_ENDPOINTS.ARTICLES
+  }/${source}`;
 
-export const useArticles = (source: NewsSource) => {
+export const useArticles = () => {
+  const [selectedSource, setSelectedSource] = useState<NewsSource>(SOURCES.CNN);
   const [data, setData] = useState<FakeArticle[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string>("Disconnected");
   const eventSourceRef = useRef<EventSource | null>(null);
 
-  const { streamFromBackend } = useSSE(streamEndpoint, {
+  const { streamFromBackend } = useSSE({
     onOpen: () => {
       setStatus("Connected");
       setLoading(true);
       setData([]); // Reset data on new connection
+      setError(null);
     },
     onMessage: (event) => {
-      console.log("Received event:", event); // Debug
-      const article = event as FakeArticle;
-      setData((prev) => [...prev, article]);
+      console.log("Received event:", event);
+      setData((prev) => [...prev, event as FakeArticle]);
     },
     onError: () => {
       setStatus("Disconnected");
+      setError(`Failed to fetch articles from ${selectedSource}`);
       setLoading(false);
     },
     onClose: () => {
+      setStatus("Disconnected");
       setLoading(false);
     },
   });
@@ -43,7 +48,9 @@ export const useArticles = (source: NewsSource) => {
     try {
       setLoading(true);
       setError(null);
-      const { data } = await axios.get<FakeArticle[]>(fetchEndpoint);
+      const { data } = await axios.get<FakeArticle[]>(
+        getEndpoints(selectedSource, false)
+      );
       setData(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch articles");
@@ -61,10 +68,15 @@ export const useArticles = (source: NewsSource) => {
 
   return {
     data,
+    setData,
     loading,
+    setLoading,
     error,
     status,
     fetchArticles,
-    streamArticles: streamFromBackend,
+    streamArticles: (source: NewsSource) =>
+      streamFromBackend(getEndpoints(source, true)),
+    selectedSource,
+    setSelectedSource,
   };
 };

@@ -33,11 +33,15 @@ const getArticlesStreamHandler = async (req: Request, res: Response) => {
     res.write(`data: ${JSON.stringify(data)}\n\n`);
   };
 
-  for await (const article of generateArticles({ source, limit: 2 })) {
-    sendEvent({ type: "article", data: JSON.stringify(article) });
+  try {
+    for await (const article of generateArticles({ source, limit: 2 })) {
+      sendEvent({ type: "article", data: JSON.stringify(article) });
+    }
+    sendEvent({ type: "done", data: "" });
+  } catch (error: any) {
+    console.error(`Error streaming articles for ${source}:`, error?.toString());
+    sendEvent({ type: "error", data: error?.toString() });
   }
-
-  sendEvent({ type: "done", data: "" });
 
   // Handle client disconnect
   req.on("close", () => {

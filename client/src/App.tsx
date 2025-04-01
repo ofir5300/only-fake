@@ -3,7 +3,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import { SOURCES } from "@only-fake/shared";
+import { NewsSource, SOURCES } from "@only-fake/shared";
 import { useEffect } from "react";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
@@ -14,6 +14,8 @@ import { format } from "date-fns";
 import Tooltip from "@mui/material/Tooltip";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import Button from "@mui/material/Button";
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 
 import { useArticles } from "./hooks/useArticles";
 const logo = require("./assets/logo.png");
@@ -56,10 +58,32 @@ const MotionGrid = motion(Grid);
 const MotionBox = motion(Box);
 
 export const App = () => {
-  const { data, loading, status, streamArticles } = useArticles(SOURCES.CNN);
+  const {
+    data,
+    setData,
+    loading,
+    setLoading,
+    error,
+    status,
+    streamArticles,
+    selectedSource,
+    setSelectedSource,
+  } = useArticles();
+
+  const handleSourceChange = (
+    _event: React.MouseEvent<HTMLElement>,
+    newSource: NewsSource | null
+  ) => {
+    if (newSource !== null) {
+      setSelectedSource(newSource);
+      setData([]);
+      setLoading(true);
+      streamArticles(newSource);
+    }
+  };
 
   useEffect(() => {
-    streamArticles();
+    streamArticles(selectedSource);
   }, []);
 
   return (
@@ -133,7 +157,7 @@ export const App = () => {
                 {status}
               </Typography>
               <IconButton
-                onClick={streamArticles}
+                onClick={() => streamArticles(selectedSource)}
                 disabled={loading}
                 sx={{
                   background: "linear-gradient(45deg, #FF3366, #FF6B6B)",
@@ -149,92 +173,43 @@ export const App = () => {
             </Box>
           </Box>
 
-          {/* Articles Grid */}
-          <Grid container spacing={4}>
-            {data.map((article, index) => (
-              <MotionGrid
-                item
-                xs={12}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                key={index}
-              >
-                <Tooltip
-                  title={
-                    <Box sx={{ p: 1 }}>
-                      <Typography variant="body2" sx={{ mb: 1 }}>
-                        {article.title}
-                      </Typography>
-                      <Button
-                        variant="contained"
-                        size="small"
-                        endIcon={<OpenInNewIcon />}
-                        onClick={() => window.open(article.url, "_blank")}
-                        sx={{
-                          background:
-                            "linear-gradient(45deg, #FF3366, #FF6B6B)",
-                        }}
-                      >
-                        Read Original
-                      </Button>
-                    </Box>
-                  }
-                  arrow
-                >
-                  <Box
-                    sx={{
-                      p: 4,
-                      borderRadius: 2,
-                      background: "rgba(255, 255, 255, 0.03)",
-                      backdropFilter: "blur(10px)",
-                      border: "1px solid rgba(255, 255, 255, 0.05)",
-                      transition: "all 0.3s ease",
-                      "&:hover": {
-                        transform: "translateY(-4px)",
-                        background: "rgba(255, 255, 255, 0.05)",
-                      },
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        mb: 2,
-                      }}
-                    >
-                      <Typography variant="overline" sx={{ color: "#FF3366" }}>
-                        {article.category}
-                      </Typography>
-                      <Typography variant="caption" sx={{ opacity: 0.5 }}>
-                        {format(new Date(), "MMM dd, yyyy")}
-                      </Typography>
-                    </Box>
-                    <Typography
-                      variant="h4"
-                      sx={{
-                        mb: 2,
-                        fontWeight: 700,
-                        background: "linear-gradient(45deg, #FFF, #FF3366)",
-                        WebkitBackgroundClip: "text",
-                        WebkitTextFillColor: "transparent",
-                      }}
-                    >
-                      {article.fake_title}
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      sx={{ opacity: 0.8, lineHeight: 1.8 }}
-                    >
-                      {article.fake_description}
-                    </Typography>
-                  </Box>
-                </Tooltip>
-              </MotionGrid>
-            ))}
-          </Grid>
+          {/* Source Selector */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              mb: 4,
+              gap: 2,
+              alignItems: "center",
+            }}
+          >
+            <ToggleButtonGroup
+              value={selectedSource}
+              exclusive
+              onChange={handleSourceChange}
+              aria-label="news source"
+              sx={{
+                bgcolor: "rgba(255, 255, 255, 0.03)",
+                borderRadius: 2,
+                "& .MuiToggleButton-root": {
+                  color: "rgba(255, 255, 255, 0.7)",
+                  borderColor: "rgba(255, 255, 255, 0.1)",
+                  "&.Mui-selected": {
+                    background: "linear-gradient(45deg, #FF3366, #FF6B6B)",
+                    color: "white",
+                  },
+                  "&:hover": {
+                    bgcolor: "rgba(255, 255, 255, 0.05)",
+                  },
+                },
+              }}
+            >
+              <ToggleButton value={SOURCES.CNN}>CNN</ToggleButton>
+              <ToggleButton value={SOURCES.GEEKTIME}>GeekTime</ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
 
-          {/* Loading State */}
+          {/* Dynamic content based on state */}
           {loading && data.length === 0 && (
             <Box
               sx={{
@@ -252,6 +227,128 @@ export const App = () => {
                 }}
               />
             </Box>
+          )}
+
+          {!loading && error && (
+            <Box
+              sx={{
+                textAlign: "center",
+                p: 6,
+                borderRadius: 2,
+                background: "rgba(255, 255, 255, 0.03)",
+                backdropFilter: "blur(10px)",
+                border: "1px solid rgba(255, 255, 255, 0.05)",
+              }}
+            >
+              <Typography
+                variant="h5"
+                sx={{
+                  mb: 2,
+                  background: "linear-gradient(45deg, #FFF, #FF3366)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                {selectedSource} Articles Unavailable
+              </Typography>
+              <Typography variant="body1" sx={{ opacity: 0.8 }}>
+                We're currently unable to fetch articles from {selectedSource}.
+                Try switching to another news source.
+              </Typography>
+            </Box>
+          )}
+
+          {!error && data.length > 0 && (
+            <Grid container spacing={4}>
+              {data.map((article, index) => (
+                <MotionGrid
+                  item
+                  xs={12}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    delay: 0.1,
+                    duration: 0.5,
+                    ease: "easeOut",
+                  }}
+                  key={`${selectedSource}-${index}`}
+                >
+                  <Tooltip
+                    title={
+                      <Box sx={{ p: 1 }}>
+                        <Typography variant="body2" sx={{ mb: 1 }}>
+                          {article.title}
+                        </Typography>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          endIcon={<OpenInNewIcon />}
+                          onClick={() => window.open(article.url, "_blank")}
+                          sx={{
+                            background:
+                              "linear-gradient(45deg, #FF3366, #FF6B6B)",
+                          }}
+                        >
+                          Read Original
+                        </Button>
+                      </Box>
+                    }
+                    arrow
+                  >
+                    <Box
+                      sx={{
+                        p: 4,
+                        borderRadius: 2,
+                        background: "rgba(255, 255, 255, 0.03)",
+                        backdropFilter: "blur(10px)",
+                        border: "1px solid rgba(255, 255, 255, 0.05)",
+                        transition: "all 0.3s ease",
+                        "&:hover": {
+                          transform: "translateY(-4px)",
+                          background: "rgba(255, 255, 255, 0.05)",
+                        },
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          mb: 2,
+                        }}
+                      >
+                        <Typography
+                          variant="overline"
+                          sx={{ color: "#FF3366" }}
+                        >
+                          {article.category}
+                        </Typography>
+                        <Typography variant="caption" sx={{ opacity: 0.5 }}>
+                          {format(new Date(), "MMM dd, yyyy")}
+                        </Typography>
+                      </Box>
+                      <Typography
+                        variant="h4"
+                        sx={{
+                          mb: 2,
+                          fontWeight: 700,
+                          background: "linear-gradient(45deg, #FFF, #FF3366)",
+                          WebkitBackgroundClip: "text",
+                          WebkitTextFillColor: "transparent",
+                        }}
+                      >
+                        {article.fake_title}
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        sx={{ opacity: 0.8, lineHeight: 1.8 }}
+                      >
+                        {article.fake_description}
+                      </Typography>
+                    </Box>
+                  </Tooltip>
+                </MotionGrid>
+              ))}
+            </Grid>
           )}
         </Container>
       </Box>

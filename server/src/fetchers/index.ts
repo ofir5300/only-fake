@@ -7,12 +7,14 @@ import {
 } from "@only-fake/shared";
 import { extractCNNRss, transformCNNArticles } from "./cnn";
 
-const extractors: Record<NewsSource, Extractor> = {
+const extractors: Record<NewsSource, Extractor | null> = {
   [SOURCES.CNN]: extractCNNRss,
+  [SOURCES.GEEKTIME]: null,
 };
 
-const transformers: Record<NewsSource, Transformer> = {
+const transformers: Record<NewsSource, Transformer | null> = {
   [SOURCES.CNN]: transformCNNArticles,
+  [SOURCES.GEEKTIME]: null,
 };
 
 export const extractAndTransform = async (
@@ -34,6 +36,6 @@ export const extractAndTransform = async (
     return articles;
   } catch (error) {
     console.error(`Failed to fetch ${source} feed:`, error);
-    return [];
+    throw error;
   }
 };
